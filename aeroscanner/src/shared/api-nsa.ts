@@ -1,0 +1,1 @@
+export const api_nsa: string = 'http://localhost:8000';

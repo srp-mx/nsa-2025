@@ -1,0 +1,97 @@
+/* Asegura que el html y body ocupen toda la altura */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+/* Contenedor principal ocupa toda la altura */
+.container-login {
+  height: 100vh;
+  min-height: 100%;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+/* La fila ocupa toda la altura disponible */
+.container-login .row {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  align-items: center;
+}
+
+/* Columna de la imagen ocupa toda la altura */
+.container-login .image {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+/* Imagen se adapta al contenedor */
+.container-login .image img {
+  width: 100%;
+  height: 100%;
+  margin-top: 0 !important;
+}
+
+/* Columna del formulario ocupa toda la altura */
+.container-login .formulario {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-left: 2rem;
+  padding-right: 2rem;
+  margin-left: 50px;
+}
+
+/* El formulario se alinea a la izquierda */
+.container-login .formulario form {
+  width: 100%;
+  text-align: left;
+}
+
+.formulario form {
+    margin-top: 50px !important;
+}
+
+/* El párrafo "Don't have an account?" queda debajo del formulario */
+.calink p {
+  margin-top: 1.5rem;
+  text-align: center;
+  width: 100%;
+  padding-left: 15px; 
+}
+
+/* Responsive para móviles */
+@media (max-width: 768px) {
+  .container-login {
+    height: auto;
+    min-height: 100vh;
+    overflow-y: auto;
+  }
+  
+  .container-login .row {
+    height: auto;
+  }
+  
+  .container-login .image,
+  .container-login .formulario {
+    height: auto;
+    min-height: 50vh;
+  }
+  
+  .container-login .formulario {
+    padding: 2rem;
+  }
+  
+  .container-login .formulario + p {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}

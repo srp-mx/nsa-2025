@@ -1,0 +1,56 @@
+<div class="container-register"> 
+    <div class="photo">
+        
+    </div>
+    <div class="forms">
+        <form [formGroup]="registerForm" (ngSubmit)="onRegister()">
+                    <div class="input-group mb-3">
+                        <div class="input-group-append">
+                            <span class="input-group-text"><fa-icon icon="user"></fa-icon></span>
+                        </div>
+                        <input type="text" class="form-control" name="name" placeholder="Nombre" required
+                            formControlName="name">
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-append">
+                            <span class="input-group-text"><fa-icon icon="user-plus"></fa-icon></span>
+                        </div>
+                        <input type="text" class="form-control" name="surname" placeholder="Apellido" required
+                            formControlName="surname">
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-append">
+                            <span class="input-group-text"><fa-icon icon="calculator"></fa-icon></span>
+                        </div>
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-append">
+                            <span class="input-group-text"><fa-icon icon="mail-bulk"></fa-icon></span>
+                        </div>
+                        <input type="mail" class="form-control" name="mail" placeholder="Mail" required
+                            formControlName="mail">
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-append">
+                            <span class="input-group-text"><fa-icon icon="key"></fa-icon></span>
+                        </div>
+                        <input type="password" class="form-control" name="password" placeholder="Password" required
+                            formControlName="password">
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-append">
+                            <span class="input-group-text"><fa-icon icon="id-badge"></fa-icon></span>
+                        </div>
+                        <input type="text" class="form-control" name="username" placeholder="Username" required
+                            formControlName="username">
+                    </div>
+                    <div class="input-group mt-3 login_container">
+                        <button [disabled]="registerForm.invalid" type="submit" name="button"
+                            class="btn btn-noneb login_btn btn-full-width"
+                            style="margin-top: 20px !important;">
+                            <span>Crear cuenta</span>
+                        </button>
+                    </div>
+                </form>
+    </div>
+</div>

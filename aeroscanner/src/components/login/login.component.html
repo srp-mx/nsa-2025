@@ -1,0 +1,42 @@
+<div class="container-login">
+  <div class="row g-5">
+    <!-- panel lateral -->
+    <div class="col-6 image">
+        <img src="../../assets/login-side.png" alt="sdfgh">
+    </div>
+
+    <!-- formulario -->
+      <div class="col-4 formulario">
+        <!-- Formulario de Login -->
+        <h3 class="fw-bold mb-2">¡Welcome to AeroScan!</h3>
+        <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
+          <p>Enter your email</p>
+          <div class="input-group mb-3">
+            <div class="input-group-append">
+              <span class="input-group-text"><fa-icon icon="user"></fa-icon></span>
+            </div>
+            <input type="text" class="form-control" name="mail" placeholder="Mail" formControlName="mail" required>
+          </div>
+          <span class="help-block text-danger" *ngIf="fg.mail.invalid && fg.mail.touched"> Write an email</span>
+
+          <p>Enter your password</p>
+          <div class="input-group mb-2">
+            <div class="input-group-append">
+                <span class="input-group-text"><fa-icon icon="key"></fa-icon></span>
+            </div>
+            <input type="password" class="form-control" name="password" placeholder="Password" formControlName="password" required>
+          </div>
+          <span class="help-block text-danger" *ngIf="fg.password.invalid && fg.password.touched"> Write your password</span>
+
+          <div class="d-flex justify-content-center mt-3 login_container">
+            <button type="submit" [disabled]="loginForm.invalid" name="button" class="btn btn-dark login_btn">
+              Login
+            </button>
+          </div>
+        </form>
+        <div class="calink">
+          <p> Don't have an account? <a href="/register">Register now</a></p>
+        </div>
+      </div>
+  </div>
+</div>
