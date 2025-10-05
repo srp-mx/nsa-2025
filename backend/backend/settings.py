@@ -34,10 +34,6 @@ SECRET_KEY = os.environ.get('SECRET_KEY', get_random_secret_key())
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = str_to_bool(os.environ.get('DEBUG', 'True'))
 
-# Database type configuration
-# This can be set to 'sqlite' for SQLite or 'postgresql' for PostgreSQL
-DATABASE_TYPE = os.environ.get('DATABASE_TYPE', 'postgresql')
-
 # Media files configuration
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
@@ -56,32 +52,15 @@ DEMO = str_to_bool(os.environ.get('DEMO', 'True'))
 if DEMO:
     DEBUG = True  # Enable debug mode for demo
     SECRET_KEY = get_random_secret_key() # Generate a random secret key for demo mode
-    DATABASE_TYPE = 'sqlite'
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
-if not DEMO:
-    DATABASE_TYPE = os.environ.get('DATABASE_TYPE', 'postgresql') 
-if DATABASE_TYPE == 'postgresql':
-    # PostgreSQL settings
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.environ.get('POSTGRES_DB', 'db'),
-            'USER': os.environ.get('POSTGRES_USER', 'user'),
-            'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'password'),
-            'HOST': os.environ.get('POSTGRES_HOST', 'localhost'),
-            'PORT': os.environ.get('POSTGRES_PORT', '5432'),
-        }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.contrib.gis.db.backends.spatialite',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
-else:
-    # SQLite settings for demo mode
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
+}
 
 # Application definition
 
@@ -92,6 +71,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.gis',
     'app',
 ]
 
@@ -171,3 +151,5 @@ LOGIN_URL = 'signin'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+SPATIALITE_LIBRARY_PATH = '/usr/lib/x86_64-linux-gnu/mod_spatialite.so'

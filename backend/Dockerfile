@@ -14,7 +14,7 @@ VOLUME ["/code/config.yaml", "/code/media"]
 # Install system dependencies
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-    postgresql-client &&\
+    postgresql-client gdal-bin libgdal-dev libsqlite3-mod-spatialite &&\
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
@@ -32,7 +32,7 @@ COPY requirements.txt /code/
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy project
-COPY . /code/
+COPY --chown=appuser:appuser . /code/
 
 # Expose the port the app runs on
 EXPOSE 8000
