@@ -10,6 +10,7 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
 from .models import Organization, Auditor, Audit, Measurement
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
@@ -76,6 +77,25 @@ def signup_view(request):
         },
         status=status.HTTP_201_CREATED,
     )
+
+class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        # You can also add custom claims here if you want
+        token["username"] = user.username
+        return token
+
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        # Add extra responses here
+        data["user_id"] = self.user.id
+        data["username"] = self.user.username
+        data["email"] = self.user.email
+        return data
+
+class MyTokenObtainPairView(TokenObtainPairView):
+    serializer_class = MyTokenObtainPairSerializer
 
 # ---------------- ORGANIZATION ----------------
 @api_view(["GET", "POST"])
