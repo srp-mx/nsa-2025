@@ -12,7 +12,7 @@ from django.contrib.gis.db import models as gis_models
 # Create your models here.
 
 class Organization(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
 
 class Site(models.Model):
     region = gis_models.PolygonField(srid=4326)
@@ -24,7 +24,7 @@ class Site(models.Model):
     )
 
 class Auditor(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
 
 class Audit(models.Model):
     score = models.IntegerField()
