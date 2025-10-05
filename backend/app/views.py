@@ -9,8 +9,14 @@ from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
 from .models import Organization, Auditor, Audit, Measurement
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
+from rest_framework import status
 
-
+@api_view(["GET"])
+@permission_classes([])
 def home(request):
     return HttpResponse(":D")
 
@@ -24,9 +30,56 @@ def parse_body(request):
             return {}
     return {}
 
+# ---------------- USER ----------------
+@api_view(["POST"])
+@permission_classes([AllowAny])  # allow anyone to register
+def signup_view(request):
+    username = request.data.get("username")
+    password = request.data.get("password")
+    email = request.data.get("email")
+    role = request.data.get("role")  # must be "organization" or "auditor"
+
+    if not username or not password or not role:
+        return Response(
+            {"error": "username, password, and role are required"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    if role not in ["organization", "auditor"]:
+        return Response(
+            {"error": "role must be either 'organization' or 'auditor'"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    if User.objects.filter(username=username).exists():
+        return Response(
+            {"error": "Username already taken"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    # Create the user
+    user = User.objects.create_user(username=username, password=password, email=email)
+
+    # Attach the user to exactly one role
+    if role == "organization":
+        Organization.objects.create(user=user)
+    elif role == "auditor":
+        Auditor.objects.create(user=user)
+
+    return Response(
+        {
+            "success": True,
+            "user_id": user.id,
+            "username": user.username,
+            "email": user.email,
+            "role": role,
+        },
+        status=status.HTTP_201_CREATED,
+    )
 
 # ---------------- ORGANIZATION ----------------
-@csrf_exempt
+@api_view(["GET", "POST"])
+@permission_classes([IsAuthenticated])
 def organization_list(request):
     if request.method == "GET":
         data = list(Organization.objects.values("id", "user_id"))
@@ -39,7 +92,8 @@ def organization_list(request):
         return JsonResponse({"id": org.id, "user_id": org.user.id})
 
 
-@csrf_exempt
+@api_view(["GET", "POST", "DELETE"])
+@permission_classes([IsAuthenticated])
 def organization_detail(request, pk):
     org = get_object_or_404(Organization, pk=pk)
 
@@ -59,7 +113,8 @@ def organization_detail(request, pk):
 
 
 # ---------------- AUDITOR ----------------
-@csrf_exempt
+@api_view(["GET", "POST"])
+@permission_classes([IsAuthenticated])
 def auditor_list(request):
     if request.method == "GET":
         data = list(Auditor.objects.values("id", "user_id"))
@@ -72,7 +127,8 @@ def auditor_list(request):
         return JsonResponse({"id": auditor.id, "user_id": auditor.user.id})
 
 
-@csrf_exempt
+@api_view(["GET", "POST", "DELETE"])
+@permission_classes([IsAuthenticated])
 def auditor_detail(request, pk):
     auditor = get_object_or_404(Auditor, pk=pk)
 
@@ -90,9 +146,62 @@ def auditor_detail(request, pk):
         auditor.delete()
         return JsonResponse({"deleted": True})
 
+from .models import Site  # add this import with your other models
+
+# ---------------- SITE ----------------
+@api_view(["GET", "POST"])
+@permission_classes([IsAuthenticated])
+def site_list(request):
+    if request.method == "GET":
+        # Return all sites as JSON
+        data = [
+            {
+                "id": s.id,
+                "organization_id": s.organization_id,
+                "region": s.region.geojson if s.region else None,
+            }
+            for s in Site.objects.all()
+        ]
+        return JsonResponse(data, safe=False)
+
+    elif request.method == "POST":
+        body = parse_body(request)
+        site = Site.objects.create(
+            region=body.get("region"),  # NOTE: must be valid GeoJSON or WKT string
+            organization_id=body.get("organization_id"),
+        )
+        return JsonResponse({"id": site.id})
+    
+
+@api_view(["GET", "POST", "DELETE"])
+@permission_classes([IsAuthenticated])
+def site_detail(request, pk):
+    site = get_object_or_404(Site, pk=pk)
+
+    if request.method == "GET":
+        return JsonResponse({
+            "id": site.id,
+            "organization_id": site.organization_id,
+            "region": site.region.geojson if site.region else None,
+        })
+
+    elif request.method == "POST":  # update
+        body = parse_body(request)
+        if "organization_id" in body:
+            site.organization_id = body["organization_id"]
+        if "region" in body:
+            site.region = body["region"]  # again, must be valid geometry
+        site.save()
+        return JsonResponse({"updated": True})
+
+    elif request.method == "DELETE":
+        site.delete()
+        return JsonResponse({"deleted": True})
+
 
 # ---------------- AUDIT ----------------
-@csrf_exempt
+@api_view(["GET", "POST"])
+@permission_classes([IsAuthenticated])
 def audit_list(request):
     if request.method == "GET":
         data = list(Audit.objects.values())
@@ -111,7 +220,8 @@ def audit_list(request):
         return JsonResponse({"id": audit.id})
 
 
-@csrf_exempt
+@api_view(["GET", "POST", "DELETE"])
+@permission_classes([IsAuthenticated])
 def audit_detail(request, pk):
     audit = get_object_or_404(Audit, pk=pk)
 
@@ -140,7 +250,8 @@ def audit_detail(request, pk):
 
 
 # ---------------- MEASUREMENT ----------------
-@csrf_exempt
+@api_view(["GET", "POST"])
+@permission_classes([IsAuthenticated])
 def measurement_list(request):
     if request.method == "GET":
         data = list(Measurement.objects.values())
@@ -157,7 +268,8 @@ def measurement_list(request):
         return JsonResponse({"id": measurement.id})
 
 
-@csrf_exempt
+@api_view(["GET", "POST", "DELETE"])
+@permission_classes([IsAuthenticated])
 def measurement_detail(request, pk):
     measurement = get_object_or_404(Measurement, pk=pk)
 

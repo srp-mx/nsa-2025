@@ -14,6 +14,15 @@ from django.contrib.gis.db import models as gis_models
 class Organization(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
+class Site(models.Model):
+    region = gis_models.PolygonField(srid=4326)
+    organization = models.ForeignKey(
+            Organization,
+            on_delete=models.CASCADE,
+            related_name="sites",
+            db_index=True
+    )
+
 class Auditor(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
