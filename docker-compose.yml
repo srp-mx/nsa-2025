@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   web:
     build: backend/
@@ -7,6 +5,7 @@ services:
     command: gunicorn backend.wsgi:application --bind 0.0.0.0:8000
     volumes:
       - .:/app
+      - nasa_db:/code/data/
     ports:
       - "8000:8000"
     depends_on:
@@ -21,3 +20,6 @@ services:
     container_name: redis
     ports:
       - "6379:6379"
+
+volumes:
+  nasa_db:

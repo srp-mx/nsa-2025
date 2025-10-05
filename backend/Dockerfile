@@ -8,9 +8,6 @@ ENV PYTHONUNBUFFERED=1
 # Set work directory
 WORKDIR /code
 
-# Create volumes for database and media files
-VOLUME ["/code/config.yaml", "/code/media"]
-
 # Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \

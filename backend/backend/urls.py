@@ -12,4 +12,18 @@ from app import views
 urlpatterns = [
     path('', views.home, name='home'),
     path('admin/', admin.site.urls),
+    # Organizations
+    path("organizations/", views.organization_list),
+    path("organizations/<int:pk>/", views.organization_detail),
+    # Auditors
+    path("auditors/", views.auditor_list),
+    path("auditors/<int:pk>/", views.auditor_detail),
+    # Audits
+    path("audits/", views.audit_list),
+    path("audits/<int:pk>/", views.audit_detail),
+    # Measurements
+    path("measurements/", views.measurement_list),
+    path("measurements/<int:pk>/", views.measurement_detail),
+    # TODO: visualizar measurements
+    # TODO: login/logout
 ]
