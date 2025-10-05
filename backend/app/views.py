@@ -472,14 +472,13 @@ def lat_lon_to_bounds(lat, lon, radius_km=10):
     
     return lat_bounds, lon_bounds
 
-def fetch_tempo_data(lat_bounds, lon_bounds, start_date, end_date, count=10):
+def fetch_tempo_data(lat_bounds, lon_bounds, start_date, end_date):
     """Fetch TEMPO NO2, HCHO, and O3 data for given bounds and time range"""
     
     logger.info(f"Searching for TEMPO data...")
     logger.info(f"  Time range: {start_date} to {end_date}")
     logger.info(f"  Lat bounds: {lat_bounds}")
     logger.info(f"  Lon bounds: {lon_bounds}")
-    logger.info(f"  Max granules: {count}")
     
     products = {
         "NO2": "TEMPO_NO2_L3",
@@ -507,7 +506,6 @@ def fetch_tempo_data(lat_bounds, lon_bounds, start_date, end_date, count=10):
             short_name=short_name,
             version="V03",
             temporal=(start_date, end_date),
-            count=count,
         )
         
         logger.info(f"  Number of {product_name} granules found: {len(results)}")
