@@ -643,10 +643,13 @@ def get_current_map(request):
         }
         cache_key = generate_cache_key(cache_params)
         
-        # Check cache
+        # Try to get data from cache
         cached_data = get_from_cache(cache_key)
         if cached_data:
-            return jsonify(cached_data)
+            return JsonResponse(cached_data)
+        
+        # If not in cache, fetch from NASA Earthdata
+        lat_bounds, lon_bounds = lat_lon_to_bounds(lat, lon)
         
         # Fetch data
         logger.info(f"Fetching data for lat={lat}, lon={lon}, date range={start_date} to {end_date}")
@@ -791,7 +794,7 @@ def get_data_range(request):
         # Check cache
         cached_data = get_from_cache(cache_key)
         if cached_data:
-            return jsonify(cached_data)
+            return JsonResponse(cached_data)
         
         # Fetch data
         logger.info(f"Fetching data for lat={lat}, lon={lon}, date range={start_date} to {end_date}")
@@ -802,7 +805,7 @@ def get_data_range(request):
         )
         
         if all_datasets is None or len(all_datasets) == 0:
-            return jsonify({'error': 'No data found for the specified parameters'}), 404
+            return JsonResponse({'error': 'No data found for the specified parameters'}, status=404)
         
         # Process each product
         logger.info("Computing temporal means and time series for all products...")
@@ -851,7 +854,7 @@ def get_data_range(request):
             }
         
         if len(product_data) == 0:
-            return jsonify({'error': 'No valid data variables found in datasets'}), 404
+            return JsonResponse({'error': 'No valid data variables found in datasets'}, status=404)
         
         # Extract map data for all products
         map_data = {}
@@ -888,8 +891,8 @@ def get_data_range(request):
         # Cache the response
         save_to_cache(cache_key, response_data)
         
-        return jsonify(response_data)
+        return JsonResponse(response_data)
         
     except Exception as e:
         logger.error(f"Error in get_data_range: {e}", exc_info=True)
-        return jsonify({'error': str(e)}), 500
+        return JsonResponse({'error': str(e)}, status=500)
