@@ -1,56 +1,40 @@
 <div class="container-fluid body-content d-flex flex-column login-register-view min-vh-100">
-  <div class="row flex-grow-1">
+  <div class="row g-5">
+    <!-- panel lateral -->
+    <div class="col-4 bg-light d-flex flex-column justify-content-center align-items-center text-center p-4 shadow-sm">
+      <img src="../../assets/login-side.png">
+      <h3 class="fw-bold mb-2">¡Welcome to AeroScan!</h3>
+      <p class="text-muted">Monitor the air where your business operates.</p>
+    </div>
 
-    <!-- Contenido principal -->
-    <div class="col-md-8 d-flex justify-content-center align-items-center">
-      <div class="row w-100 justify-content-center">
-
-        <div class="col-md-5 border-end border-1 pe-5">
-          <!-- Formulario de Login -->
-          <h2>Entrar</h2>
-          <p>Ingrese los datos de su cuenta para iniciar sesión.</p>
-
-          <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
-            <div class="input-group mb-3">
-              <div class="input-group-append">
-                <span class="input-group-text"><fa-icon icon="user"></fa-icon></span>
-              </div>
-              <input type="text" class="form-control" name="username" placeholder="Username" formControlName="username" required>
+    <!-- formulario -->
+      <div class="col-8 pe-5 gap-4 mb-3">
+        <!-- Formulario de Login -->
+        <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
+          <p>Enter your email</p>
+          <div class="input-group mb-3">
+            <div class="input-group-append">
+              <span class="input-group-text"><fa-icon icon="user"></fa-icon></span>
             </div>
-            <span class="help-block text-danger" *ngIf="fg.username.invalid && fg.username.touched">
-              Ingresa un nombre de usuario
-            </span>
+            <input type="text" class="form-control" name="mail" placeholder="Mail" formControlName="mail" required>
+          </div>
+          <span class="help-block text-danger" *ngIf="fg.mail.invalid && fg.mail.touched"> Write an email</span>
 
-            <div class="input-group mb-2">
-              <div class="input-group-append">
+          <p>Enter your password</p>
+          <div class="input-group mb-2">
+            <div class="input-group-append">
                 <span class="input-group-text"><fa-icon icon="key"></fa-icon></span>
-              </div>
-              <input type="password" class="form-control" name="password" placeholder="Contraseña" formControlName="password" required>
             </div>
-            <span class="help-block text-danger" *ngIf="fg.password.invalid && fg.password.touched">
-              Ingresa la contraseña.
-            </span>
+            <input type="password" class="form-control" name="password" placeholder="Password" formControlName="password" required>
+          </div>
+          <span class="help-block text-danger" *ngIf="fg.password.invalid && fg.password.touched"> Write your password</span>
 
-            <div class="d-flex justify-content-center mt-3 login_container">
-              <button type="submit" [disabled]="loginForm.invalid" name="button" class="btn btn-dark login_btn">
-                Iniciar sesión
-              </button>
-            </div>
-          </form>
-        </div>
-
-        <div class="col-md-4 register-section ps-5">
-          <!-- Formulario de Registro -->
-          <h2>Crear cuenta</h2>
-          <p>¿Necesitas una cuenta?</p>
           <div class="d-flex justify-content-center mt-3 login_container">
-            <button name="button" class="btn btn-outline-dark login_btn" routerLink="/register">
-              Registrarse
+            <button type="submit" [disabled]="loginForm.invalid" name="button" class="btn btn-dark login_btn">
+              Login
             </button>
           </div>
-        </div>
-
+        </form>
       </div>
-    </div>
   </div>
 </div>
