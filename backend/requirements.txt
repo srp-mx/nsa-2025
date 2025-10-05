@@ -14,6 +14,7 @@ redis>=5.0,<6.0
 sqlparse==0.5.3
 tzdata==2025.2
 whitenoise==6.10.0
+Cython<3
 # NASA
 xarray>=2024.9.0
 earthaccess>=0.15.1
