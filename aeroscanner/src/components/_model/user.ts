@@ -1,8 +1,8 @@
 export class User {
     username: string = '';
-    mail: string = '';
+    email: string = '';
     password: string = '';
-    rol: string = ''
+    role: string = 'organization'
 
     constructor(){
         
