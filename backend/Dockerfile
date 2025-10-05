@@ -12,11 +12,22 @@ WORKDIR /code
 VOLUME ["/code/config.yaml", "/code/media"]
 
 # Install system dependencies
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    postgresql-client gdal-bin libgdal-dev libsqlite3-mod-spatialite &&\
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    python3-dev \
+    libpq-dev \
+    libproj-dev proj-data proj-bin \
+    libgeos-dev \
+    libgdal-dev gdal-bin \
+    #libatlas-base-dev liblapack-dev \
+    libopenblas-dev liblapack-dev \
+    libfreetype6-dev libpng-dev libjpeg-dev zlib1g-dev \
+    libnetcdf-dev libhdf5-dev \
+    libsqlite3-mod-spatialite \
+    curl git \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
 
 # Create a non-root user with UID 1000
 RUN adduser --disabled-password --gecos '' --uid 1000 appuser

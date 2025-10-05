@@ -41,9 +41,10 @@ except Exception as e:
     cache = None
 
 # Earth Access for NASA TEMPO data
-auth = earthaccess.login()
-if not auth.authenticated:
-    auth = earthaccess.login(strategy='netrc')
+auth = earthaccess.login(strategy='environment')
+# auth = earthaccess.login()
+# if not auth.authenticated:
+    # auth = earthaccess.login(strategy='netrc')
 
 if not auth.authenticated:
     raise RuntimeError("Authentication failed. Please check your Earthdata credentials.")
