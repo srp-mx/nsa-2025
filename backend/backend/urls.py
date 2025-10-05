@@ -40,4 +40,8 @@ urlpatterns = [
     # Measurements
     path("measurements/", views.measurement_list),
     path("measurements/<int:pk>/", views.measurement_detail),
+    # NASA Earthdata API
+    path("health/", views.health_check, name="health_check"),
+    path("api/map/current/", views.get_current_map, name="get_current_map"),
+    path("api/data/range/", views.get_data_range, name="get_data_range"),
 ]
