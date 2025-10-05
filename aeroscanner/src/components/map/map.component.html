@@ -1,5 +1,34 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
 <div class="map-container">
   <div class="map-frame">
+    <div class="search-bar">
+      <div class="search-input-container">
+        <input type="text" id="place-search" placeholder="Search you bussines directions...">
+        <button class="search-button" aria-label="Search">
+          <i class="fas fa-magnifying-glass"></i>
+        </button>
+      </div>
+      <div id="suggestions-container" class="suggestions-dropdown"></div>
+      <div class="time-period-selector">
+        
+        <select id="time-limit-type" class="time-type-select">
+          <option value="none">Select a time lapse.</option>
+          <option value="date">Specific period</option>
+          <option value="time">Today's hours</option>
+        </select>
+        
+        <div id="date-inputs" class="input-group hidden">
+          <input type="date" id="start-date" placeholder="Start Date">
+          <input type="date" id="end-date" placeholder="End Date">
+        </div>
+
+        <div id="time-inputs" class="input-group hidden">
+          <input type="time" id="start-time" placeholder="Starting Time">
+          <input type="time" id="end-time" placeholder="Ending Time">
+        </div>
+      </div>
+      </div>
     <div id="map"></div>
   </div>
 </div>

@@ -10,6 +10,7 @@ import { SwalMessages } from '../../shared/swal-messages';
 
 import { FontAwesomeModule, FaIconLibrary } from '@fortawesome/angular-fontawesome';
 import { fas } from '@fortawesome/free-solid-svg-icons';
+
 @Component({
   selector: 'app-register',
   standalone: true,

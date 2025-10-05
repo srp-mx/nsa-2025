@@ -1,17 +1,147 @@
 .map-container {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  margin: 30px;
+  width: 100%;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+  font-family: Arial, sans-serif;
 }
- 
+
 .map-frame {
-  border: 2px solid black;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  border-radius: 20px; /* Esquinas curveadas */
+  overflow: hidden;
+}
+
+/* Barra de búsqueda */
+.search-bar {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000; 
+  width: 100%;
+  max-width: 500px;
+  display: flex;           
+  align-items: center;    
+  gap: 10px;  
+}
+
+.search-input-container {
+  display: flex;
+  flex: 1;                 
+  border-radius: 25px;
+  overflow: hidden;
+  align-self: right;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+}
+
+#place-search {
+  flex: 1;
+  padding: 10px 15px;
+  border: none;
+  outline: none;
+  font-size: 16px;
+}
+
+.search-button {
+  background-color: #007bff;
+  border: none;
+  padding: 0 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 18px;
+}
+
+/* Cambiar color al pasar el mouse */
+.search-button:hover {
+  background-color: #0056b3;
+}
+
+/* Mapa */
+#map {
+  width: 100%;
   height: 100%;
 }
- 
-#map {
-  height: 100%;
+
+.hidden {
+  display: none !important; 
+}
+
+.time-period-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 8px; /* Espacio entre el select y los inputs */
+}
+
+.time-type-select {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  width: 100%; /* El selector ocupa todo el ancho */
+  box-sizing: border-box; /* Asegura que el padding no desborde */
+}
+
+.input-group {
+  display: flex;
+  gap: 8px; /* Espacio entre los inputs de inicio y fin */
+  width: 100%;
+}
+
+.input-group input {
+  flex-grow: 1; /* Ambos inputs comparten el espacio equitativamente */
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  box-sizing: border-box;
+}
+
+@media (max-width: 500px) {
+  .search-bar {
+    width: 95%;
+  }
+
+  .input-group {
+    flex-direction: column;
+  }
+}
+
+.suggestions-dropdown {
+  position: absolute; /* Para que aparezca sobre el mapa */
+  top: 48px; /* Ajusta este valor para que aparezca justo debajo del input */
+  left: 10px; /* Asegura la alineación horizontal con el input */
+  right: 10px; 
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-top: none;
+  border-radius: 0 0 4px 4px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1001; /* Debe estar por encima de la search-bar */
+  max-height: 200px; /* Limita la altura de la lista */
+  overflow-y: auto; /* Agrega scroll si hay muchas sugerencias */
+  display: none; /* Por defecto estará oculto, solo JS lo mostrará */
+  padding: 5px;
+  border-radius: 10px;
+}
+
+.suggestion-item {
+  padding: 10px;
+  cursor: pointer;
+  border-bottom: 1px solid #eee;
+  font-size: 14px;
+  color: #333;
+}
+
+.suggestion-item:last-child {
+  border-bottom: none;
+}
+
+.suggestion-item:hover {
+  background-color: #f0f0f0;
 }
