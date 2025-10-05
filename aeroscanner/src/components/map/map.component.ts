@@ -5,9 +5,13 @@ import 'leaflet-routing-machine';
 import { icon, Marker } from 'leaflet';
 import { Inject, Input, OnInit } from '@angular/core';
 import 'leaflet.heat';
+import { MapService } from '../_service/map/map.service';
+import { Subscription } from 'rxjs';
+import { MapResponse } from '../_model/map'
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 
-export const DEFAULT_LAT = 48.20807;
-export const DEFAULT_LON =  16.37320;
+export const DEFAULT_LAT = 34.0522;
+export const DEFAULT_LON =  -118.2437;
 export const TITULO = 'Proyecto';
 
 const iconRetinaUrl = 'assets/marker-icon-2x.png';
@@ -29,29 +33,41 @@ export class MapComponent implements OnInit {
   @Input() lon: number = DEFAULT_LON;
   @Input() titulo: string = TITULO ;
 
-  constructor() {}
+  private subscriptions: Subscription[] = [];
+
+  constructor(private mapService: MapService) {}
 
   ngOnInit(): void {
     this.initMap();
   }
 
   private initMap(): void {
-    this.map = L.map('map').setView([50.5, 30.5], 17);
+    this.map = L.map('map').setView([this.lat, this.lon], 10);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 18,
     }).addTo(this.map);
+    this.subscriptions.push(
+      this.mapService.getCurrentMap(this.lat, this.lon).subscribe({
+        next: (res: MapResponse) => {
+          const map_data = this.mapService.processMapData(res);
 
-    // 👇 Crear un heatmap
-    const heatPoints = [
-      [50.5, 30.5, 1],
-      [50.6, 30.4, 1],
-      [50.4, 30.6, 1],
-    ];
+          console.log(map_data);
 
-    const heat = (L as any).heatLayer(heatPoints, {
-      maxZoom: 15,
-      minOpacity: 0.4
-    }).addTo(this.map);
+          for (var contaminante in map_data) {
+            var heatPoints: number[][] = map_data[contaminante];
+
+            var heat = (L as any).heatLayer(heatPoints, {maxZoom: 15, minOpacity: 0.4}).addTo(this.map);
+          }
+        },
+        error: (err: HttpErrorResponse) => {
+          console.error('Error fetching map data', err);
+        }
+      })
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 }

@@ -1,0 +1,1 @@
+export const api_nasa: string = 'http://16.144.69.113:8000';

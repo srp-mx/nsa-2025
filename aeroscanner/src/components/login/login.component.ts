@@ -75,4 +75,8 @@ export class LoginComponent {
   get fg() {
     return this.loginForm.controls;
   }
+
+  ngOnDestroy(): void {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
+  }
 }
