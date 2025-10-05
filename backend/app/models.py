@@ -13,9 +13,7 @@ class Region(models.Model):
     lon = models.FloatField()
 
 class Organization(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-class Auditor(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
 
 class Site(models.Model):
     region = models.ForeignKey(Region, on_delete=models.CASCADE)
@@ -26,6 +24,8 @@ class Site(models.Model):
             db_index=True
     )
 
+class Auditor(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
 class Audit(models.Model):
     score = models.IntegerField()
     max_score = models.IntegerField()

@@ -14,10 +14,13 @@ from rest_framework_simplejwt.views import (
     TokenBlacklistView,
 )
 
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
+
 urlpatterns = [
     # Signup
     path("auth/signup/", views.signup_view, name="signup"),
-    path("auth/login/", views.login_view, name="login"),
+    path("auth/login/", views.MyTokenObtainPairView.as_view(), name="token_obtain_pair"),
     # Refresh access token
     path("auth/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     # Logout (blacklist refresh token)
