@@ -10,8 +10,6 @@ import { Subscription } from 'rxjs';
 import { MapResponse } from '../_model/map'
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 
-export const DEFAULT_LAT = 35.0522;
-export const DEFAULT_LON =  -118.2437;
 export const TITULO = 'Proyecto';
 
 const iconRetinaUrl = 'assets/marker-icon-2x.png';
@@ -29,8 +27,8 @@ export class MapComponent implements OnInit {
 
   private map:any;
 
-  @Input() lat: number = DEFAULT_LAT;
-  @Input() lon: number = DEFAULT_LON;
+  @Input() lat: number = 34;
+  @Input() lon: number = -118;
   @Input() titulo: string = TITULO ;
 
   public fechaInicio: String | null = null;
@@ -48,35 +46,38 @@ export class MapComponent implements OnInit {
     this.setupSearchAutocomplete();
   }
 
-  private initMap(): void {
-    this.map = L.map('map').setView([this.lat, this.lon], 10);
+  private updateMapData(lat: number, lon: number): void {
+    // Eliminamos capas anteriores (si existen)
+    this.map.eachLayer((layer: any) => {
+      if (layer instanceof L.TileLayer) return; // mantenemos solo el fondo
+      this.map.removeLayer(layer);
+    });
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 18,
-    }).addTo(this.map);
+    // Hacemos la nueva petición al servicio con las coordenadas actualizadas
     this.subscriptions.push(
-      this.mapService.getCurrentMap(this.lat, this.lon).subscribe({
+      this.mapService.getCurrentMap(lat, lon).subscribe({
         next: (res: MapResponse) => {
           const map_data = this.mapService.processMapData(res);
+          console.log('New map data for coords:', lat, lon, map_data);
 
-          console.log(map_data);
-
-          for (var contaminante in map_data) {
-            var heatPoints: number[][] = map_data[contaminante];
-
-            var heat = (L as any).heatLayer(heatPoints, {max: res.products[contaminante].max_value,
-              gradient: { 0.000: '#440154',
-                          0.100: '#482173',
-                          0.200: '#433E85',
-                          0.300: '#38598C',
-                          0.400: '#2D708E',
-                          0.500: '#25858E',
-                          0.600: '#1E9B8A',
-                          0.700: '#2BB07F',
-                          0.800: '#51C56A',
-                          0.900: '#85D54A',
-                          1.000: '#FDE725'
-                      }}).addTo(this.map);
+          for (const contaminante in map_data) {
+            const heatPoints: number[][] = map_data[contaminante];
+            const heat = (L as any).heatLayer(heatPoints, {
+              max: res.products[contaminante].max_value,
+              gradient: {
+                0.000: '#440154',
+                0.100: '#482173',
+                0.200: '#433E85',
+                0.300: '#38598C',
+                0.400: '#2D708E',
+                0.500: '#25858E',
+                0.600: '#1E9B8A',
+                0.700: '#2BB07F',
+                0.800: '#51C56A',
+                0.900: '#85D54A',
+                1.000: '#FDE725'
+              }
+            }).addTo(this.map);
           }
         },
         error: (err: HttpErrorResponse) => {
@@ -84,6 +85,17 @@ export class MapComponent implements OnInit {
         }
       })
     );
+  }
+
+
+  private initMap(): void {
+    this.map = L.map('map').setView([this.lat, this.lon], 10);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 18,
+    }).addTo(this.map);
+
+    this.updateMapData(this.lat, this.lon);    
   }
 
   ngOnDestroy(): void {
@@ -166,10 +178,11 @@ export class MapComponent implements OnInit {
               this.itemlat = String(item.lat);
               this.itemlon = String(item.lon);
               this.lat = item.lat;
-              this.lon = item.lon;
-              this.ngOnInit();
+              this.lon = item.lon; 
+              
+              this.updateMapData(this.lat, this.lon);  
               this.map.setView([parseFloat(item.lat), parseFloat(item.lon)], 16);
-              L.marker([parseFloat(item.lat), parseFloat(item.lon)]).addTo(this.map);
+              //L.marker([parseFloat(item.lat), parseFloat(item.lon)]).addTo(this.map);
             });
             container.appendChild(suggestionItem);
           });
