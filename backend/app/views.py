@@ -583,6 +583,33 @@ def extract_map_data(data_array):
     
     return result
 
+def interpolate_data(data_array, factor=2):
+    """
+    Interpolate the data array to a higher resolution using bilinear interpolation.
+    """
+    if 'latitude' not in data_array.coords or 'longitude' not in data_array.coords:
+        return data_array
+
+    lat = data_array.coords['latitude']
+    lon = data_array.coords['longitude']
+
+    # If we have less than 2 points on either axis, interpolation is not possible.
+    if lat.size < 2 or lon.size < 2:
+        return data_array
+
+    # Extract numpy arrays to avoid issues with xarray scalar DataArrays
+    lat_min = np.asarray(lat.min())
+    lat_max = np.asarray(lat.max())
+    lon_min = np.asarray(lon.min())
+    lon_max = np.asarray(lon.max())
+
+    new_lat = np.linspace(lat_min, lat_max, len(lat) * factor)
+    new_lon = np.linspace(lon_min, lon_max, len(lon) * factor)
+
+    interpolated_da = data_array.interp(latitude=new_lat, longitude=new_lon, method='linear')
+    
+    return interpolated_da
+
 # --- API Endpoints ---
 
 @api_view(['GET'])
@@ -682,10 +709,13 @@ def get_current_map(request):
             if var_name in temporal_mean_ds:
                 mean_column = temporal_mean_ds[var_name].compute()
                 
+                # Interpolate data to get more points
+                interpolated_column = interpolate_data(mean_column)
+                
                 product_data[product_name] = {
-                    'mean_value': float(mean_column.mean().values),
-                    'min_value': float(mean_column.min().values),
-                    'max_value': float(mean_column.max().values),
+                    'mean_value': float(interpolated_column.mean().values),
+                    'min_value': float(interpolated_column.min().values),
+                    'max_value': float(interpolated_column.max().values),
                     'data_points': int(subset_ds.sizes.get('time', 0)),
                     'units': 'molecules/cm^2'
                 }
@@ -711,7 +741,8 @@ def get_current_map(request):
             
             if var_name in temporal_mean_ds:
                 mean_column = temporal_mean_ds[var_name].compute()
-                map_data[product_name] = extract_map_data(mean_column)
+                interpolated_column = interpolate_data(mean_column)
+                map_data[product_name] = extract_map_data(interpolated_column)
                 logger.info(f"Map data extracted successfully for {product_name}")
         
         # Prepare response
@@ -830,6 +861,7 @@ def get_data_range(request):
             # Calculate temporal mean
             temporal_mean_ds = subset_ds.mean(dim="time")
             mean_column = temporal_mean_ds[var_name].compute()
+            interpolated_column = interpolate_data(mean_column)
             
             # Extract time series data
             time_series_data = []
@@ -844,9 +876,9 @@ def get_data_range(request):
                     })
             
             product_data[product_name] = {
-                'temporal_mean': float(mean_column.mean().values),
-                'temporal_min': float(mean_column.min().values),
-                'temporal_max': float(mean_column.max().values),
+                'temporal_mean': float(interpolated_column.mean().values),
+                'temporal_min': float(interpolated_column.min().values),
+                'temporal_max': float(interpolated_column.max().values),
                 'data_points': int(subset_ds.sizes.get('time', 0)),
                 'time_series': time_series_data,
                 'units': 'molecules/cm^2'
@@ -873,7 +905,8 @@ def get_data_range(request):
             
             if var_name in temporal_mean_ds:
                 mean_column = temporal_mean_ds[var_name].compute()
-                map_data[product_name] = extract_map_data(mean_column)
+                interpolated_column = interpolate_data(mean_column)
+                map_data[product_name] = extract_map_data(interpolated_column)
                 logger.info(f"Map data extracted successfully for {product_name}")
         
         # Prepare response
