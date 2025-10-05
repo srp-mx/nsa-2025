@@ -14,16 +14,17 @@ from rest_framework_simplejwt.views import (
     TokenBlacklistView,
 )
 
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
+
 urlpatterns = [
     # Signup
     path("auth/signup/", views.signup_view, name="signup"),
-    # Login (get tokens)
-    path("auth/login/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
+    path("auth/login/", views.MyTokenObtainPairView.as_view(), name="token_obtain_pair"),
     # Refresh access token
     path("auth/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     # Logout (blacklist refresh token)
     path("auth/logout/", TokenBlacklistView.as_view(), name="token_blacklist"),
-    path('', views.home, name='home'),
     path('admin/', admin.site.urls),
     # Organizations
     path("organizations/", views.organization_list),
@@ -40,4 +41,8 @@ urlpatterns = [
     # Measurements
     path("measurements/", views.measurement_list),
     path("measurements/<int:pk>/", views.measurement_detail),
+    # NASA Earthdata API
+    path("health/", views.health_check, name="health_check"),
+    path("api/map/current/", views.get_current_map, name="get_current_map"),
+    path("api/data/range/", views.get_data_range, name="get_data_range"),
 ]

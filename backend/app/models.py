@@ -4,18 +4,19 @@ Models for the app.
 This file defines the database models for the application system.
 """
 from django.db import models
-from django.db.models import Q
 from django.contrib.auth.models import User
-from django.utils import timezone
-from django.contrib.gis.db import models as gis_models
 
 # Create your models here.
 
+class Region(models.Model):
+    lat = models.FloatField()
+    lon = models.FloatField()
+
 class Organization(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
 
 class Site(models.Model):
-    region = gis_models.PolygonField(srid=4326)
+    region = models.ForeignKey(Region, on_delete=models.CASCADE)
     organization = models.ForeignKey(
             Organization,
             on_delete=models.CASCADE,
@@ -24,8 +25,7 @@ class Site(models.Model):
     )
 
 class Auditor(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-
+    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
 class Audit(models.Model):
     score = models.IntegerField()
     max_score = models.IntegerField()
@@ -49,7 +49,7 @@ class Audit(models.Model):
 class Measurement(models.Model):
     start_time = models.DateTimeField()
     end_time = models.DateTimeField(null=True,blank=True)
-    region = gis_models.PolygonField(srid=4326)
+    region = models.ForeignKey(Region, on_delete=models.CASCADE)
     organization = models.ForeignKey(
         Organization,
         on_delete=models.CASCADE,
