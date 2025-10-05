@@ -17,13 +17,11 @@ from rest_framework_simplejwt.views import (
 urlpatterns = [
     # Signup
     path("auth/signup/", views.signup_view, name="signup"),
-    # Login (get tokens)
-    path("auth/login/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
+    path("auth/login/", views.login_view, name="login"),
     # Refresh access token
     path("auth/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     # Logout (blacklist refresh token)
     path("auth/logout/", TokenBlacklistView.as_view(), name="token_blacklist"),
-    path('', views.home, name='home'),
     path('admin/', admin.site.urls),
     # Organizations
     path("organizations/", views.organization_list),

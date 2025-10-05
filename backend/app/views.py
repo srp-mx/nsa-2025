@@ -14,12 +14,17 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from rest_framework import status
-
-@api_view(["GET"])
-@permission_classes([])
-def home(request):
-    return HttpResponse(":D")
-
+from django.contrib.auth import authenticate
+from rest_framework.authtoken.models import Token
+import earthaccess
+import hashlib
+import json
+import logging
+import numpy as np
+import os
+import redis
+import xarray as xr
+from datetime import datetime, timezone, timedelta
 
 # Utility: parse request body safely
 def parse_body(request):
@@ -31,6 +36,33 @@ def parse_body(request):
     return {}
 
 # ---------------- USER ----------------
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def login_view(request):
+    username = request.data.get("username")
+    password = request.data.get("password")
+
+    user = authenticate(username=username, password=password)
+    if user is not None:
+        token, _ = Token.objects.get_or_create(user=user)
+        
+        role = None
+        if hasattr(user, 'organization'):
+            role = 'organization'
+        elif hasattr(user, 'auditor'):
+            role = 'auditor'
+
+        return Response({
+            "success": True,
+            "token": token.key,
+            "user_id": user.id,
+            "username": user.username,
+            "email": user.email,
+            "role": role
+        })
+    else:
+        return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+
 @api_view(["POST"])
 @permission_classes([AllowAny])  # allow anyone to register
 def signup_view(request):
@@ -66,9 +98,12 @@ def signup_view(request):
     elif role == "auditor":
         Auditor.objects.create(user=user)
 
+    token, _ = Token.objects.get_or_create(user=user)
+
     return Response(
         {
             "success": True,
+            "token": token.key,
             "user_id": user.id,
             "username": user.username,
             "email": user.email,
@@ -79,7 +114,7 @@ def signup_view(request):
 
 # ---------------- ORGANIZATION ----------------
 @api_view(["GET", "POST"])
-# @permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated])
 def organization_list(request):
     if request.method == "GET":
         data = list(Organization.objects.values("id", "user_id"))
@@ -93,7 +128,7 @@ def organization_list(request):
 
 
 @api_view(["GET", "POST", "DELETE"])
-# @permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated])
 def organization_detail(request, pk):
     org = get_object_or_404(Organization, pk=pk)
 
@@ -114,7 +149,7 @@ def organization_detail(request, pk):
 
 # ---------------- AUDITOR ----------------
 @api_view(["GET", "POST"])
-# @permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated])
 def auditor_list(request):
     if request.method == "GET":
         data = list(Auditor.objects.values("id", "user_id"))
@@ -128,7 +163,7 @@ def auditor_list(request):
 
 
 @api_view(["GET", "POST", "DELETE"])
-# @permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated])
 def auditor_detail(request, pk):
     auditor = get_object_or_404(Auditor, pk=pk)
 
@@ -146,11 +181,11 @@ def auditor_detail(request, pk):
         auditor.delete()
         return JsonResponse({"deleted": True})
 
-from .models import Site  # add this import with your other models
+from .models import Site, Region
 
 # ---------------- SITE ----------------
 @api_view(["GET", "POST"])
-# @permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated])
 def site_list(request):
     if request.method == "GET":
         # Return all sites as JSON
@@ -158,7 +193,7 @@ def site_list(request):
             {
                 "id": s.id,
                 "organization_id": s.organization_id,
-                "region": s.region.geojson if s.region else None,
+                "region": {"lat": s.region.lat, "lon": s.region.lon} if s.region else None,
             }
             for s in Site.objects.all()
         ]
@@ -166,15 +201,24 @@ def site_list(request):
 
     elif request.method == "POST":
         body = parse_body(request)
+        region_data = body.get("region")
+        if not region_data or "lat" not in region_data or "lon" not in region_data:
+            return JsonResponse({"error": "region with lat and lon is required"}, status=400)
+        
+        region, _ = Region.objects.get_or_create(
+            lat=region_data["lat"],
+            lon=region_data["lon"]
+        )
+
         site = Site.objects.create(
-            region=body.get("region"),  # NOTE: must be valid GeoJSON or WKT string
+            region=region,
             organization_id=body.get("organization_id"),
         )
         return JsonResponse({"id": site.id})
     
 
 @api_view(["GET", "POST", "DELETE"])
-# @permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated])
 def site_detail(request, pk):
     site = get_object_or_404(Site, pk=pk)
 
@@ -182,7 +226,7 @@ def site_detail(request, pk):
         return JsonResponse({
             "id": site.id,
             "organization_id": site.organization_id,
-            "region": site.region.geojson if site.region else None,
+            "region": {"lat": site.region.lat, "lon": site.region.lon} if site.region else None,
         })
 
     elif request.method == "POST":  # update
@@ -190,7 +234,13 @@ def site_detail(request, pk):
         if "organization_id" in body:
             site.organization_id = body["organization_id"]
         if "region" in body:
-            site.region = body["region"]  # again, must be valid geometry
+            region_data = body.get("region")
+            if region_data and "lat" in region_data and "lon" in region_data:
+                region, _ = Region.objects.get_or_create(
+                    lat=region_data["lat"],
+                    lon=region_data["lon"]
+                )
+                site.region = region
         site.save()
         return JsonResponse({"updated": True})
 
@@ -201,7 +251,7 @@ def site_detail(request, pk):
 
 # ---------------- AUDIT ----------------
 @api_view(["GET", "POST"])
-# @permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated])
 def audit_list(request):
     if request.method == "GET":
         data = list(Audit.objects.values())
@@ -221,7 +271,7 @@ def audit_list(request):
 
 
 @api_view(["GET", "POST", "DELETE"])
-# @permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated])
 def audit_detail(request, pk):
     audit = get_object_or_404(Audit, pk=pk)
 
@@ -251,7 +301,7 @@ def audit_detail(request, pk):
 
 # ---------------- MEASUREMENT ----------------
 @api_view(["GET", "POST"])
-# @permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated])
 def measurement_list(request):
     if request.method == "GET":
         data = list(Measurement.objects.values())
@@ -259,17 +309,25 @@ def measurement_list(request):
 
     elif request.method == "POST":
         body = parse_body(request)
+        region_data = body.get("region")
+        if not region_data or "lat" not in region_data or "lon" not in region_data:
+            return JsonResponse({"error": "region with lat and lon is required"}, status=400)
+
+        region, _ = Region.objects.get_or_create(
+            lat=region_data["lat"],
+            lon=region_data["lon"]
+        )
         measurement = Measurement.objects.create(
             start_time=body.get("start_time"),
             end_time=body.get("end_time"),
-            region=body.get("region"),  # NOTE: must be a valid GeoJSON or WKT string
+            region=region,
             organization_id=body.get("organization_id"),
         )
         return JsonResponse({"id": measurement.id})
 
 
 @api_view(["GET", "POST", "DELETE"])
-# @permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated])
 def measurement_detail(request, pk):
     measurement = get_object_or_404(Measurement, pk=pk)
 
@@ -278,15 +336,23 @@ def measurement_detail(request, pk):
             "id": measurement.id,
             "start_time": measurement.start_time,
             "end_time": measurement.end_time,
-            "region": measurement.region.geojson if measurement.region else None,
+            "region": {"lat": measurement.region.lat, "lon": measurement.region.lon} if measurement.region else None,
             "organization_id": measurement.organization_id,
         })
 
     elif request.method == "POST":  # update
         body = parse_body(request)
-        for field in ["start_time", "end_time", "region", "organization_id"]:
+        for field in ["start_time", "end_time", "organization_id"]:
             if field in body:
                 setattr(measurement, field, body[field])
+        if "region" in body:
+            region_data = body.get("region")
+            if region_data and "lat" in region_data and "lon" in region_data:
+                region, _ = Region.objects.get_or_create(
+                    lat=region_data["lat"],
+                    lon=region_data["lon"]
+                )
+                measurement.region = region
         measurement.save()
         return JsonResponse({"updated": True})
 
@@ -295,18 +361,6 @@ def measurement_detail(request, pk):
         return JsonResponse({"deleted": True})
     
 # --- NASA EARTHDATA API PROXY ---
-
-import earthaccess
-import hashlib
-import json
-import logging
-import numpy as np
-import os
-import redis
-import xarray as xr
-from datetime import datetime, timezone, timedelta
-from flask import Flask, request, jsonify
-
 # --- Configuration ---
 REDIS_HOST = os.environ.get('REDIS_HOST', 'localhost')
 REDIS_PORT = int(os.environ.get('REDIS_PORT', 6379))
@@ -315,9 +369,6 @@ CACHE_EXPIRY = int(os.environ.get('CACHE_EXPIRY', 3600))  # 1 hour default
 # Setup logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-
-# --- Flask App ---
-app = Flask(__name__)
 
 # --- Initialization ---
 # Connect to Redis instance
@@ -822,9 +873,3 @@ def get_data_range(request):
     except Exception as e:
         logger.error(f"Error in get_data_range: {e}", exc_info=True)
         return jsonify({'error': str(e)}), 500
-
-# --- Run Server ---
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
-
-

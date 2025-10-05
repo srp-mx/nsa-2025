@@ -5,12 +5,179 @@ This API provides access to NASA's TEMPO (Tropospheric Emissions: Monitoring of 
 ## Base URL
 
 ```
-http://16.144.69.113:5000
+http://16.144.69.113:8000
 ```
 
-## Endpoints
+## Django API Endpoints
 
-### 1. Health Check
+These endpoints are for user management and other application-specific data.
+
+### Authentication
+
+#### Signup
+
+Create a new user account.
+
+**Endpoint:** `POST /auth/signup/`
+
+**Request Body:**
+```json
+{
+  "username": "newuser",
+  "password": "securepassword123",
+  "email": "user@example.com",
+  "role": "organization" 
+}
+```
+*`role` can be "organization" or "auditor".*
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "token": "your_auth_token",
+  "user_id": 1,
+  "username": "newuser",
+  "email": "user@example.com",
+  "role": "organization"
+}
+```
+
+#### Login
+
+Authenticate and receive a token.
+
+**Endpoint:** `POST /auth/login/`
+
+**Request Body:**
+```json
+{
+  "username": "testuser",
+  "password": "password"
+}
+```
+
+**Example Response:**
+```json
+{
+    "success": true,
+    "token": "your_auth_token",
+    "user_id": 1,
+    "username": "testuser",
+    "email": "test@example.com",
+    "role": "organization"
+}
+```
+
+#### Refresh Token
+
+Obtain a new access token using a refresh token.
+
+**Endpoint:** `POST /auth/refresh/`
+
+**Request Body:**
+```json
+{
+  "refresh": "your_refresh_token"
+}
+```
+
+**Example Response:**
+```json
+{
+  "access": "new_access_token"
+}
+```
+
+#### Logout
+
+Blacklist a refresh token to log out.
+
+**Endpoint:** `POST /auth/logout/`
+
+**Request Body:**
+```json
+{
+  "refresh": "your_refresh_token"
+}
+```
+*On success, this returns a `204 No Content` response.*
+
+---
+
+### Organizations
+
+Endpoints for managing organizations. Authentication is required.
+
+- **`GET /organizations/`**: List all organizations.
+- **`POST /organizations/`**: Create a new organization.
+  - **Body**: `{ "user_id": <user_id> }`
+- **`GET /organizations/<id>/`**: Retrieve a specific organization.
+- **`POST /organizations/<id>/`**: Update an organization.
+  - **Body**: `{ "user_id": <new_user_id> }`
+- **`DELETE /organizations/<id>/`**: Delete an organization.
+
+---
+
+### Auditors
+
+Endpoints for managing auditors. Authentication is required.
+
+- **`GET /auditors/`**: List all auditors.
+- **`POST /auditors/`**: Create a new auditor.
+  - **Body**: `{ "user_id": <user_id> }`
+- **`GET /auditors/<id>/`**: Retrieve a specific auditor.
+- **`POST /auditors/<id>/`**: Update an auditor.
+  - **Body**: `{ "user_id": <new_user_id> }`
+- **`DELETE /auditors/<id>/`**: Delete an auditor.
+
+---
+
+### Sites
+
+Endpoints for managing sites. Authentication is required.
+
+- **`GET /sites/`**: List all sites.
+- **`POST /sites/`**: Create a new site.
+  - **Body**: `{ "organization_id": <org_id>, "region": { "lat": 34.05, "lon": -118.24 } }`
+- **`GET /sites/<id>/`**: Retrieve a specific site.
+- **`POST /sites/<id>/`**: Update a site.
+  - **Body**: `{ "organization_id": <new_org_id>, "region": { "lat": 35.00, "lon": -119.00 } }`
+- **`DELETE /sites/<id>/`**: Delete a site.
+
+---
+
+### Audits
+
+Endpoints for managing audits. Authentication is required.
+
+- **`GET /audits/`**: List all audits.
+- **`POST /audits/`**: Create a new audit.
+  - **Body**: `{ "score": 95, "max_score": 100, "is_passing": true, "notes": "Good", "organization_id": 1, "auditor_id": 1 }`
+- **`GET /audits/<id>/`**: Retrieve a specific audit.
+- **`POST /audits/<id>/`**: Update an audit.
+- **`DELETE /audits/<id>/`**: Delete an audit.
+
+---
+
+### Measurements
+
+Endpoints for managing measurements. Authentication is required.
+
+- **`GET /measurements/`**: List all measurements.
+- **`POST /measurements/`**: Create a new measurement.
+  - **Body**: `{ "start_time": "2024-01-01T00:00:00Z", "end_time": "2024-01-01T01:00:00Z", "region": { "lat": 34.05, "lon": -118.24 }, "organization_id": 1 }`
+- **`GET /measurements/<id>/`**: Retrieve a specific measurement.
+- **`POST /measurements/<id>/`**: Update a measurement.
+- **`DELETE /measurements/<id>/`**: Delete a measurement.
+
+---
+
+## NASA Earthdata API Endpoints
+
+These endpoints provide access to NASA's TEMPO satellite data.
+
+### Health Check
 
 Check if the API is running and connected to required services.
 
@@ -32,7 +199,9 @@ curl http://16.144.69.113:5000/health
 
 ---
 
-### 2. Current Map Data
+### Map Data
+
+#### Current Map Data
 
 Get air quality map data for a 50km radius around specified coordinates for the current day (actually fetches data from one year ago due to TEMPO data availability).
 
@@ -81,7 +250,9 @@ curl "http://16.144.69.113:5000/api/map/current?lat=34.0522&lon=-118.2437"
 
 ---
 
-### 3. Date Range Data
+### Time-Series Data
+
+#### Date Range Data
 
 Get air quality data for a 10km radius around specified coordinates for a custom date range, including time series data.
 

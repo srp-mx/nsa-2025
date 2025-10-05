@@ -41,9 +41,7 @@ MEDIA_URL = '/media/'
 # CONNECTION CONFIGURATION
 URL = os.environ.get('URL', 'http://localhost:8000')
 
-# Append just the domain to the allowed hosts
-DOMAIN = URL.split("://")[-1].split("/")[0].split(':')[0]
-ALLOWED_HOSTS = [DOMAIN]
+ALLOWED_HOSTS = ['*']
 
 CSRF_TRUSTED_ORIGINS = [URL]
 
@@ -65,23 +63,21 @@ DATABASES = {
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'rest_framework',
-    'app',
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "rest_framework",
+    "rest_framework.authtoken",
+    "app",
 ]
 
 REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework_simplejwt.authentication.JWTAuthentication",
-    ),
-    # "DEFAULT_PERMISSION_CLASSES": (
-        # "rest_framework.permissions.IsAuthenticated",
-    # ),
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
 }
 
 MIDDLEWARE = [
@@ -95,7 +91,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'backend.urls'
+ROOT_URLCONF = "backend.urls"
 
 TEMPLATES = [
     {
