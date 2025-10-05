@@ -79,7 +79,7 @@ def signup_view(request):
 
 # ---------------- ORGANIZATION ----------------
 @api_view(["GET", "POST"])
-@permission_classes([IsAuthenticated])
+# @permission_classes([IsAuthenticated])
 def organization_list(request):
     if request.method == "GET":
         data = list(Organization.objects.values("id", "user_id"))
@@ -93,7 +93,7 @@ def organization_list(request):
 
 
 @api_view(["GET", "POST", "DELETE"])
-@permission_classes([IsAuthenticated])
+# @permission_classes([IsAuthenticated])
 def organization_detail(request, pk):
     org = get_object_or_404(Organization, pk=pk)
 
@@ -114,7 +114,7 @@ def organization_detail(request, pk):
 
 # ---------------- AUDITOR ----------------
 @api_view(["GET", "POST"])
-@permission_classes([IsAuthenticated])
+# @permission_classes([IsAuthenticated])
 def auditor_list(request):
     if request.method == "GET":
         data = list(Auditor.objects.values("id", "user_id"))
@@ -128,7 +128,7 @@ def auditor_list(request):
 
 
 @api_view(["GET", "POST", "DELETE"])
-@permission_classes([IsAuthenticated])
+# @permission_classes([IsAuthenticated])
 def auditor_detail(request, pk):
     auditor = get_object_or_404(Auditor, pk=pk)
 
@@ -150,7 +150,7 @@ from .models import Site  # add this import with your other models
 
 # ---------------- SITE ----------------
 @api_view(["GET", "POST"])
-@permission_classes([IsAuthenticated])
+# @permission_classes([IsAuthenticated])
 def site_list(request):
     if request.method == "GET":
         # Return all sites as JSON
@@ -174,7 +174,7 @@ def site_list(request):
     
 
 @api_view(["GET", "POST", "DELETE"])
-@permission_classes([IsAuthenticated])
+# @permission_classes([IsAuthenticated])
 def site_detail(request, pk):
     site = get_object_or_404(Site, pk=pk)
 
@@ -201,7 +201,7 @@ def site_detail(request, pk):
 
 # ---------------- AUDIT ----------------
 @api_view(["GET", "POST"])
-@permission_classes([IsAuthenticated])
+# @permission_classes([IsAuthenticated])
 def audit_list(request):
     if request.method == "GET":
         data = list(Audit.objects.values())
@@ -221,7 +221,7 @@ def audit_list(request):
 
 
 @api_view(["GET", "POST", "DELETE"])
-@permission_classes([IsAuthenticated])
+# @permission_classes([IsAuthenticated])
 def audit_detail(request, pk):
     audit = get_object_or_404(Audit, pk=pk)
 
@@ -251,7 +251,7 @@ def audit_detail(request, pk):
 
 # ---------------- MEASUREMENT ----------------
 @api_view(["GET", "POST"])
-@permission_classes([IsAuthenticated])
+# @permission_classes([IsAuthenticated])
 def measurement_list(request):
     if request.method == "GET":
         data = list(Measurement.objects.values())
@@ -269,7 +269,7 @@ def measurement_list(request):
 
 
 @api_view(["GET", "POST", "DELETE"])
-@permission_classes([IsAuthenticated])
+# @permission_classes([IsAuthenticated])
 def measurement_detail(request, pk):
     measurement = get_object_or_404(Measurement, pk=pk)
 
