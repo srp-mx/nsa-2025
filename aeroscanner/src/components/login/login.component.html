@@ -1,47 +1,56 @@
-<div class="container body-content d-flex flex-column login-register-view">
-  <div class="d-flex justify-content-center align-items-center flex-grow-1">
-    <div class="row w-100">
-      <div class="col-md-2"></div>
-      <div class="col-md-4 border-end border-1 pe-5">
-        <!-- Formulario de Login -->
-        <h2>Entrar</h2>
-        <p>Ingrese los datos su cuenta para iniciar sesión.</p>
-        <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
-          <div class="input-group mb-3">
-            <div class="input-group-append">
-              <span class="input-group-text"><fa-icon icon="user"></fa-icon></span>
+<div class="container-fluid body-content d-flex flex-column login-register-view min-vh-100">
+  <div class="row flex-grow-1">
+
+    <!-- Contenido principal -->
+    <div class="col-md-8 d-flex justify-content-center align-items-center">
+      <div class="row w-100 justify-content-center">
+
+        <div class="col-md-5 border-end border-1 pe-5">
+          <!-- Formulario de Login -->
+          <h2>Entrar</h2>
+          <p>Ingrese los datos de su cuenta para iniciar sesión.</p>
+
+          <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
+            <div class="input-group mb-3">
+              <div class="input-group-append">
+                <span class="input-group-text"><fa-icon icon="user"></fa-icon></span>
+              </div>
+              <input type="text" class="form-control" name="username" placeholder="Username" formControlName="username" required>
             </div>
-            <input type="text" class="form-control" name="username" placeholder="Username" formControlName="username"
-                required>
-          </div>
-          <span class="help-block" style="color:red;" *ngIf="fg.username.invalid && fg.username.touched">Ingresa un nombre de usuario</span>
-          <div class="input-group mb-2">
-            <div class="input-group-append">
-              <span class="input-group-text"><fa-icon icon="key"></fa-icon></span>
+            <span class="help-block text-danger" *ngIf="fg.username.invalid && fg.username.touched">
+              Ingresa un nombre de usuario
+            </span>
+
+            <div class="input-group mb-2">
+              <div class="input-group-append">
+                <span class="input-group-text"><fa-icon icon="key"></fa-icon></span>
+              </div>
+              <input type="password" class="form-control" name="password" placeholder="Contraseña" formControlName="password" required>
             </div>
-            <input type="password" class="form-control" name="password" placeholder="Contraseña" formControlName="password" required>
-          </div>
-          <span class="help-block" style="color:red;" *ngIf="fg.password.invalid && fg.password.touched">Ingresa la contraseña.</span>
+            <span class="help-block text-danger" *ngIf="fg.password.invalid && fg.password.touched">
+              Ingresa la contraseña.
+            </span>
+
+            <div class="d-flex justify-content-center mt-3 login_container">
+              <button type="submit" [disabled]="loginForm.invalid" name="button" class="btn btn-dark login_btn">
+                Iniciar sesión
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <div class="col-md-4 register-section ps-5">
+          <!-- Formulario de Registro -->
+          <h2>Crear cuenta</h2>
+          <p>¿Necesitas una cuenta?</p>
           <div class="d-flex justify-content-center mt-3 login_container">
-            <button type="submit" [disabled]="loginForm.invalid" name="button" class="btn btn-dark login_btn">          
+            <button name="button" class="btn btn-outline-dark login_btn" routerLink="/register">
+              Registrarse
             </button>
           </div>
-          <div class="mt-5">  </div>
-        </form>
-      </div>
-
-      <div class="col-md-3 register-section">
-        <!-- Formulario de Registro -->
-        <h2>Crear cuenta</h2>
-        <p> ¿Necesitas una cuenta?</p>
-        <div class="d-flex justify-content-center mt-3 login_container">
-          <button name="button" class="btn btn-dark login_btn" routerLink="/register">
-            Resgistrarse
-          </button>
         </div>
+
       </div>
-      <div class="col-md-2"></div>
     </div>
   </div>
 </div>
-

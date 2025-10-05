@@ -3,8 +3,8 @@ import { CommonModule } from '@angular/common';
 
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faCoffee } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeModule, FaIconLibrary } from '@fortawesome/angular-fontawesome';
+import { fas } from '@fortawesome/free-solid-svg-icons';
 
 
 @Component({
@@ -14,8 +14,6 @@ import { faCoffee } from '@fortawesome/free-solid-svg-icons';
   styleUrl: './login.component.css'
 })
 export class LoginComponent {
-
-  faCoffee = faCoffee;
   
   loginForm = new FormGroup(
     {
@@ -24,7 +22,9 @@ export class LoginComponent {
     }
   )
 
-  constructor(private router: Router) { }
+  constructor(private router: Router, library: FaIconLibrary) {
+    library.addIconPacks(fas);
+  }
 
   public onLogin(): void {
     var loginFormValue = this.loginForm.value as { username: string, password: string };
