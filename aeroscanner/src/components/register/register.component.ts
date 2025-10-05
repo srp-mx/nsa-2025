@@ -8,10 +8,12 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { SwalMessages } from '../../shared/swal-messages';
 
+import { FontAwesomeModule, FaIconLibrary } from '@fortawesome/angular-fontawesome';
+import { fas } from '@fortawesome/free-solid-svg-icons';
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, RouterModule],
+  imports: [ReactiveFormsModule, CommonModule, RouterModule, FontAwesomeModule],
   templateUrl: './register.component.html',
   styleUrl: './register.component.css'
 })
@@ -29,16 +31,15 @@ export class RegisterComponent {
     },    
   );
 
-  public showLoading: boolean;
   private subscriptions: Subscription[] = [];
 
-  constructor(private router: Router) {
-    this.showLoading = false;
+  constructor(private router: Router, library: FaIconLibrary) {
+    library.addIconPacks(fas);
   }
 
   ngOnInit(): void {
     //if (this.authenticationService.isUserLoggedIn()) {
-      this.router.navigateByUrl('');
+      //this.router.navigateByUrl('');
 
   }
 
@@ -54,16 +55,13 @@ export class RegisterComponent {
     usuario.rfc = usuarioFormValue.rfc;
     usuario.username = usuarioFormValue.username;
 
-    this.showLoading = true;
     this.subscriptions.push(
       this.authenticationService.register(usuario).subscribe(
         (response: {message: string}) => {
-          this.showLoading = false;
           this.swal.successMessage("¡Tu cuenta ha sido creada exitosamente!");
         },
         (errorResponse: HttpErrorResponse) => {
           this.swal.errorMessage(errorResponse.error.message);
-          this.showLoading = false;
         }
       )
     );*/

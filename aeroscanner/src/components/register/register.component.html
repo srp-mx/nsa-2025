@@ -45,12 +45,10 @@
                             formControlName="username">
                     </div>
                     <div class="input-group mt-3 login_container">
-                        <button [disabled]="registerForm.invalid || showLoading" type="submit" name="button"
+                        <button [disabled]="registerForm.invalid" type="submit" name="button"
                             class="btn btn-noneb login_btn btn-full-width"
                             style="margin-top: 20px !important;">
-                            <i *ngIf="showLoading" class="fas fa-spinner fa-spin"></i>&nbsp;&nbsp;
-                            <span *ngIf="showLoading">Cargando...</span>
-                            <span *ngIf="!showLoading">Crear cuenta</span>
+                            <span>Crear cuenta</span>
                         </button>
                     </div>
                 </form>
