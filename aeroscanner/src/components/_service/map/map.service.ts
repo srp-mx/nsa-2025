@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 
 
 import { Observable } from 'rxjs';
-import { api_nasa } from '../../../shared/api-nasa';
 import { MapResponse } from '../../_model/map'
 
 //import { of } from 'rxjs';
@@ -21,7 +20,7 @@ export class MapService {
       .set('lat', lat)
       .set('lon', lon);
 
-    return this.http.get<MapResponse>(`${api_nasa}/api/map/current`, { params });
+    return this.http.get<MapResponse>(`/api/map/current`, { params });
   }
 
   public processMapData(res: MapResponse): Record<string, number[][]> {

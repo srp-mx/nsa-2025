@@ -57,7 +57,7 @@ export class MapComponent implements OnInit {
           for (var contaminante in map_data) {
             var heatPoints: number[][] = map_data[contaminante];
 
-            var heat = (L as any).heatLayer(heatPoints, {maxZoom: 15, minOpacity: 0.4}).addTo(this.map);
+            var heat = (L as any).heatLayer(heatPoints, {maxZoom: 10, blur: 70}).addTo(this.map);
           }
         },
         error: (err: HttpErrorResponse) => {
