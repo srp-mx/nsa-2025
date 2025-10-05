@@ -10,7 +10,7 @@ import { Subscription } from 'rxjs';
 import { MapResponse } from '../_model/map'
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 
-export const DEFAULT_LAT = 34.0522;
+export const DEFAULT_LAT = 35.0522;
 export const DEFAULT_LON =  -118.2437;
 export const TITULO = 'Proyecto';
 
@@ -64,7 +64,19 @@ export class MapComponent implements OnInit {
           for (var contaminante in map_data) {
             var heatPoints: number[][] = map_data[contaminante];
 
-            var heat = (L as any).heatLayer(heatPoints, {maxZoom: 10, blur: 70}).addTo(this.map);
+            var heat = (L as any).heatLayer(heatPoints, {max: res.products[contaminante].max_value,
+              gradient: { 0.000: '#440154',
+                          0.100: '#482173',
+                          0.200: '#433E85',
+                          0.300: '#38598C',
+                          0.400: '#2D708E',
+                          0.500: '#25858E',
+                          0.600: '#1E9B8A',
+                          0.700: '#2BB07F',
+                          0.800: '#51C56A',
+                          0.900: '#85D54A',
+                          1.000: '#FDE725'
+                      }}).addTo(this.map);
           }
         },
         error: (err: HttpErrorResponse) => {
