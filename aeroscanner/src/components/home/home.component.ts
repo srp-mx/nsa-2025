@@ -12,5 +12,9 @@ import { fas } from '@fortawesome/free-solid-svg-icons';
 export class HomeComponent {
   constructor(private router: Router, library: FaIconLibrary) {
       library.addIconPacks(fas);
-    }
+  }
+
+  public onSubmit(): void {
+    this.router.navigateByUrl('/login');
+  }
 }

@@ -31,6 +31,10 @@ export class LoginComponent {
     library.addIconPacks(fas);
   }
 
+  public onSubmit(): void {
+    this.router.navigateByUrl('/map');
+  }
+
   public onLogin(): void {
     var loginFormValue = this.loginForm.value as { username: string, password: string };
 
@@ -41,7 +45,7 @@ export class LoginComponent {
             const token = response.body.access;
             const refresh = response.body.refresh;
             this.authenticationService.saveTokens(token, refresh);
-            this.router.navigateByUrl('');
+            this.router.navigateByUrl('/map');
           }else{
             if (response.body === null) {
               console.log('La API no devolvió cuerpo en la respuesta');

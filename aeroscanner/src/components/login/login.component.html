@@ -29,7 +29,7 @@
           <span class="help-block text-danger" *ngIf="fg.password.invalid && fg.password.touched"> Write your password</span>
 
           <div class="d-flex justify-content-center mt-3 login_container">
-            <button type="submit" [disabled]="loginForm.invalid" name="button" class="btn btn-dark login_btn">
+            <button type="submit" [disabled]="loginForm.invalid" name="button" class="btn btn-dark login_btn" (click)="onSubmit()">
               Login
             </button>
           </div>

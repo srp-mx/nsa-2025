@@ -165,6 +165,9 @@ export class MapComponent implements OnInit {
               parseFloat(item.lon);
               this.itemlat = String(item.lat);
               this.itemlon = String(item.lon);
+              this.lat = item.lat;
+              this.lon = item.lon;
+              this.ngOnInit();
               this.map.setView([parseFloat(item.lat), parseFloat(item.lon)], 16);
               L.marker([parseFloat(item.lat), parseFloat(item.lon)]).addTo(this.map);
             });
